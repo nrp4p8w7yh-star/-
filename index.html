@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>线上快递分拣站｜16:9横屏版</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+body {
+  width:100vw;
+  height:100vh;
+  overflow: hidden;
+  background: linear-gradient(180deg, #b9e6ff 0%, #dff7ff 45%, #fff4d6 100%);
+}
+
+.cloud {
+  position: fixed;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.85;
+  filter: blur(0.5px);
+  z-index: 0;
+}
+
+.cloud1 {
+  width: 100px;
+  height: 30px;
+  top: 9%;
+  left: 11%;
+  box-shadow:
+    30px -10px 0 10px #ffffff,
+    60px 5px 0 8px #ffffff;
+}
+
+.cloud2 {
+  width: 140px;
+  height: 34px;
+  top: 16%;
+  right: 14%;
+  box-shadow:
+    35px -12px 0 12px #ffffff,
+    75px 8px 0 10px #ffffff;
+}
+
+.sun {
+  position: fixed;
+  top: 7%;
+  left: 47%;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fffbe7, #ffd54a 70%, #ffb020);
+  box-shadow:
+    0 0 35px rgba(255, 220, 90, 0.9),
+    0 0 90px rgba(255, 180, 60, 0.5);
+  z-index: 0;
+}
+
+h1.game-title {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding-top:14px;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: #1d5aa1;
+  text-shadow:
+    2px 2px 0 #ffffff,
+    4px 4px 0 rgba(40, 90, 160, 0.25);
+}
+
+.star-panel {
+  position: relative;
+  z-index: 10;
+  width: fit-content;
+  margin: 10px auto 14px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid #ffd447;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(255, 170, 40, 0.45);
+}
+
+.star-panel span {
+  font-size: 24px;
+  margin: 0 6px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.game-main{
+  position:relative;
+  z-index:10;
+  display:flex;
+  gap:26px;
+  width:92vw;
+  height:64vh;
+  margin:0 auto;
+  align-items:center;
+}
+
+.box-zone {
+  flex:1;
+  height:100%;
+  padding:16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 3px dashed #74b9ff;
+  border-radius: 24px;
+  box-shadow: inset 0 0 20px rgba(116, 185, 255, 0.35);
+}
+
+.box-zone h2 {
+  text-align: center;
+  color: #1d5aa1;
+  margin-bottom: 12px;
+  font-size: 19px;
+}
+
+.box-row {
+  display: flex;
+  justify-content: center;
+  gap:20px;
+  flex-wrap: wrap;
+}
+
+.drag-box {
+  width:114px;
+  height:132px;
+  border-radius: 18px;
+  cursor: grab;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow:
+    0 20px 30px rgba(0, 0, 0, 0.35),
+    inset 0 12px 20px rgba(255, 255, 255, 0.35),
+    inset 0 -14px 25px rgba(0, 0, 0, 0.18);
+}
+
+.drag-box:hover {
+  transform: translateY(-8px) rotate(-1.5deg);
+}
+
+.drag-box:active {
+  cursor: grabbing;
+  transform: scale(1.06);
+}
+
+.drag-box::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.drag-box::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 14px;
+  bottom: 14px;
+  width: 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: inset -4px 0 8px rgba(0, 0, 0, 0.25);
+}
+
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height:36px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.box-label {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 11px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: bold;
+  font-size:13px;
+  white-space: nowrap;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 2px 4px rgba(255, 255, 255, 0.45);
+}
+
+.box-avatar {
+  position: absolute;
+  left: 50%;
+  top:66px;
+  transform: translateX(-50%);
+  width:70px;
+  height:70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size:36px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 4px solid #fff;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+/* 错误抖动动画 */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-12px); }
+  40% { transform: translateX(12px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+.shake-anim{
+  animation: shake 0.4s ease;
+}
+
+/* 飞出的小星星 */
+.fly-star{
+  position:fixed;
+  font-size:32px;
+  z-index:2000;
+  pointer-events:none;
+}
+
+.house-zone {
+  flex:1;
+  height:100%;
+  padding:16px;
+  background: linear-gradient(180deg, #dfffd6, #c6f5a8);
+  border-radius: 28px;
+  border: 3px solid #9bd564;
+  box-shadow: 0 18px 35px rgba(80, 140, 60, 0.35);
+}
+
+.house-zone h2 {
+  text-align: center;
+  color: #2f7d36;
+  margin-bottom:16px;
+  font-size:19px;
+}
+/* 住宅两行布局：上3下2，居中 */
+.house-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+.house-row-top{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+.house-row-bottom{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+.house {
+  width:126px;
+  height:154px;
+  border-radius: 22px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease;
+  box-shadow:
+    0 22px 35px rgba(0, 0, 0, 0.4),
+    inset 0 14px 25px rgba(255, 255, 255, 0.4),
+    inset 0 -18px 30px rgba(0, 0, 0, 0.2);
+}
+
+.house:hover {
+  transform: translateY(-8px);
+}
+
+.house-roof {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left:70px solid transparent;
+  border-right:70px solid transparent;
+  border-bottom:38px solid rgba(0, 0, 0, 0.35);
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.35));
+}
+
+.house::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left:16px;
+  right:16px;
+  height:22px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  filter: blur(3px);
+}
+
+.house::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top:14px;
+  bottom:14px;
+  width:13px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.house-door {
+  position: absolute;
+  left: 50%;
+  bottom:18px;
+  transform: translateX(-50%);
+  width:38px;
+  height:54px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 4px solid rgba(255, 255, 255, 0.85);
+  border-radius: 22px 22px 6px 6px;
+  box-shadow:
+    inset 0 0 12px rgba(0, 0, 0, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.house-window {
+  position: absolute;
+  top:46px;
+  width:26px;
+  height:26px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.house-window.left {
+  left:14px;
+}
+
+.house-window.right {
+  right:14px;
+}
+
+.house-name {
+  position: absolute;
+  top:12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
+  font-size:13px;
+  font-weight: bold;
+  color: #222;
+  white-space: nowrap;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  background: linear-gradient(180deg, #fffbe7, #ffe27a);
+  padding: 36px 52px;
+  border-radius: 24px;
+  text-align: center;
+  border: 4px solid #fff;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    inset 0 0 30px rgba(255, 255, 255, 0.6);
+}
+
+.popup-content h2 {
+  font-size: 30px;
+  color: #2f7d36;
+  margin-bottom: 14px;
+}
+
+.popup-content p {
+  font-size: 17px;
+  color: #444;
+  margin-bottom: 22px;
+}
+
+.popup-content button {
+  padding: 11px 26px;
+  font-size:17px;
+  background: linear-gradient(180deg, #4cd964, #2fae4a);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(47, 174, 74, 0.5);
+}
+
+.popup-content button:hover {
+  filter: brightness(1.08);
+}
+/*错误提示弹窗*/
+.error-popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:1200;
+  align-items:center;
+  justify-content:center;
+}
+.error-popup .error-content{
+  background:#fff2f2;
+  border:4px solid #f88;
+  border-radius:24px;
+  padding:32px 48px;
+  text-align:center;
+}
+.error-popup h3{
+  font-size:26px;
+  color:#d03939;
+  margin-bottom:16px;
+}
+.error-popup p{
+  font-size:17px;
+  color:#444;
+  margin-bottom:22px;
+}
+.error-popup button{
+  padding:10px 24px;
+  background:#dd5555;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:17px;
+  cursor:pointer;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+.sparkle {
+  animation: sparkle 0.6s ease;
+}
+</style>
+</head>
+
+<body>
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="sun"></div>
+
+<h1 class="game-title">📦 线上快递分拣站 🏠</h1>
+
+<div class="star-panel" id="starPanel">
+  得分星星：<span id="starShow">☆☆☆☆☆</span>
+</div>
+
+<div class="game-main">
+  <div class="box-zone">
+    <h2>📤 快递区</h2>
+    <div class="box-row" id="boxContainer"></div>
+  </div>
+  <div class="house-zone">
+    <h2>🏡 住宅区</h2>
+    <div class="house-wrap">
+      <div class="house-row-top" id="houseTop"></div>
+      <div class="house-row-bottom" id="houseBottom"></div>
+    </div>
+  </div>
+</div>
+
+<div class="popup" id="winPopup">
+  <div class="popup-content">
+    <h2>🎉 恭喜你闯关成功！</h2>
+    <p>你已经把全部快递送到正确的家啦！</p>
+    <button onclick="restartGame()">再玩一次</button>
+  </div>
+</div>
+
+<div class="error-popup" id="errorPopup">
+  <div class="error-content">
+    <h3>❌ 送错啦！</h3>
+    <p>这份快递送错咯，请重新送一次！</p>
+    <button onclick="closeErrorPopup()">知道了</button>
+  </div>
+</div>
+
+<audio id="correctAudio" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/ambiences/celebratory_bell_chime.ogg" type="audio/ogg">
+<audio id="winAudio" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short_up.ogg" type="audio/ogg">
+
+<script>
+  const expressList = [
+    {
+      name: "小明",
+      boxBg: "#4fa3ff",
+      stickerBg: "#2f7ad1",
+      avatar: "👨‍💼",
+      houseBg: "#5aa9ff",
+      roofColor: "#2f6fd1"
+    },
+    {
+      name: "小红",
+      boxBg: "#ff6b6b",
+      stickerBg: "#d14343",
+      avatar: "👩‍⚕️",
+      houseBg: "#ff6b6b",
+      roofColor: "#d14343"
+    },
+    {
+      name: "阿强",
+      boxBg: "#ffa94d",
+      stickerBg: "#d17a22",
+      avatar: "👷",
+      houseBg: "#ffa94d",
+      roofColor: "#d17a22"
+    },
+    {
+      name: "李老师",
+      boxBg: "#6bcB77",
+      stickerBg: "#2f9e44",
+      avatar: "👩‍🏫",
+      houseBg: "#6bcB77",
+      roofColor: "#2f9e44"
+    },
+    {
+      name: "陈博士",
+      boxBg: "#a78bfa",
+      stickerBg: "#7c3aed",
+      avatar: "👨‍🔬",
+      houseBg: "#a78bfa",
+      roofColor: "#7c3aed"
+    }
+  ];
+
+  let starCount = 0;
+  let dragElement = null;
+  let offsetX = 0;
+  let offsetY = 0;
+  let originalParent = null;
+  let originalRect = null;
+
+  //关闭错误弹窗
+  function closeErrorPopup(){
+    document.getElementById("errorPopup").style.display="none";
+    //退回快递区
+    if(dragElement){
+      dragElement.classList.remove("shake-anim");
+      dragElement.style.position = "relative";
+      dragElement.style.left = "";
+      dragElement.style.top = "";
+      dragElement.style.zIndex = "";
+      dragElement.style.transition = "";
+      originalParent.appendChild(dragElement);
+      dragElement = null;
+    }
+  }
+
+  // 创建飞向计分区的星星动画
+  function createFlyingStar(startX,startY){
+    const starDom = document.createElement("div");
+    starDom.innerText = "⭐";
+    starDom.className = "fly-star";
+    starDom.style.left = startX + "px";
+    starDom.style.top = startY + "px";
+    document.body.appendChild(starDom);
+    const target = document.getElementById("starPanel").getBoundingClientRect();
+    const endX = target.left + target.width / 2;
+    const endY = target.top + target.height / 2;
+    starDom.animate([
+      {transform:'scale(1)', left:startX+'px', top:startY+'px', opacity:1},
+      {transform:'scale(1.6)', left:endX+'px', top:endY+'px', opacity:0.9},
+      {transform:'scale(0.3)', left:endX+'px', top:endY+'px', opacity:0}
+    ],{duration:650, easing:"ease-out"});
+    setTimeout(()=>{ starDom.remove(); },700);
+  }
+
+  function renderBoxes() {
+    const boxContainer = document.getElementById("boxContainer");
+    boxContainer.innerHTML = "";
+    const shuffled = [...expressList].sort(() => Math.random() - 0.5);
+    shuffled.forEach(item => {
+      const box = document.createElement("div");
+      box.className = "drag-box";
+      box.style.background = `linear-gradient(160deg, ${item.boxBg} 0%, ${item.stickerBg} 100%)`;
+      box.dataset.name = item.name;
+      box.innerHTML = `
+        <div class="tape"></div>
+        <div class="box-label" style="background:${item.stickerBg}">收件人：${item.name}</div>
+        <div class="box-avatar" style="border-color:${item.stickerBg}">${item.avatar}</div>
+      `;
+      box.addEventListener("mousedown", startDrag);
+      box.addEventListener("touchstart", startDragTouch, { passive: false });
+      boxContainer.appendChild(box);
+    });
+  }
+
+  function renderHouses() {
+    const houseTop = document.getElementById("houseTop");
+    const houseBottom = document.getElementById("houseBottom");
+    houseTop.innerHTML = "";
+    houseBottom.innerHTML = "";
+    const shuffled = [...expressList].sort(() => Math.random() - 0.5);
+    //上排3，下排2
+    const topArr = shuffled.slice(0,3);
+    const bottomArr = shuffled.slice(3);
+
+    topArr.forEach(item=>{
+      const house = createHouseDom(item);
+      houseTop.appendChild(house);
+    });
+    bottomArr.forEach(item=>{
+      const house = createHouseDom(item);
+      houseBottom.appendChild(house);
+    });
+  }
+
+  function createHouseDom(item){
+    const house = document.createElement("div");
+    house.className = "house";
+    house.style.background = `linear-gradient(160deg, ${item.houseBg} 0%, ${item.roofColor} 100%)`;
+    house.dataset.housename = item.name;
+    house.innerHTML = `
+        <div class="house-roof" style="border-bottom-color:${item.roofColor}"></div>
+        <div class="house-name">${item.name}的家</div>
+        <div class="house-window left"></div>
+        <div class="house-window right"></div>
+        <div class="house-door"></div>
+      `;
+    return house;
+  }
+
+  function startDrag(e) {
+    e.preventDefault();
+    dragElement = e.currentTarget;
+    originalParent = dragElement.parentElement;
+    originalRect = dragElement.getBoundingClientRect();
+    offsetX = e.clientX - originalRect.left;
+    offsetY = e.clientY - originalRect.top;
+    dragElement.style.position = "fixed";
+    dragElement.style.left = originalRect.left + "px";
+    dragElement.style.top = originalRect.top + "px";
+    dragElement.style.zIndex = 1000;
+    document.body.appendChild(dragElement);
+    document.addEventListener("mousemove", onDragMove);
+    document.addEventListener("mouseup", endDrag);
+  }
+
+  function startDragTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    dragElement = e.currentTarget;
+    originalParent = dragElement.parentElement;
+    originalRect = dragElement.getBoundingClientRect();
+    offsetX = touch.clientX - originalRect.left;
+    offsetY = touch.clientY - originalRect.top;
+    dragElement.style.position = "fixed";
+    dragElement.style.left = originalRect.left + "px";
+    dragElement.style.top = originalRect.top + "px";
+    dragElement.style.zIndex = 1000;
+    document.body.appendChild(dragElement);
+    document.addEventListener("touchmove", onDragMoveTouch, { passive: false });
+    document.addEventListener("touchend", endDragTouch);
+  }
+
+  function onDragMove(e) {
+    if (!dragElement) return;
+    dragElement.style.left = (e.clientX - offsetX) + "px";
+    dragElement.style.top = (e.clientY - offsetY) + "px";
+  }
+
+  function onDragMoveTouch(e) {
+    if (!dragElement) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    dragElement.style.left = (touch.clientX - offsetX) + "px";
+    dragElement.style.top = (touch.clientY - offsetY) + "px";
+  }
+
+  function endDrag(e) {
+    document.removeEventListener("mousemove", onDragMove);
+    document.removeEventListener("mouseup", endDrag);
+    if (!dragElement) return;
+    checkDrop(e.clientX, e.clientY);
+  }
+
+  function endDragTouch(e) {
+    document.removeEventListener("touchmove", onDragMoveTouch);
+    document.removeEventListener("touchend", endDragTouch);
+    if (!dragElement) return;
+    const touch = e.changedTouches[0];
+    checkDrop(touch.clientX, touch.clientY);
+  }
+
+  function checkDrop(x, y) {
+    const houses = document.querySelectorAll(".house");
+    let hitHouse = null;
+    for (const house of houses) {
+      const rect = house.getBoundingClientRect();
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+        hitHouse = house;
+        break;
+      }
+    }
+    if(hitHouse){
+      if (dragElement.dataset.name === hitHouse.dataset.housename) {
+          //正确送达
+          starCount++;
+          createFlyingStar(x,y);
+          updateStars();
+          document.getElementById("correctAudio").currentTime = 0;
+          document.getElementById("correctAudio").play();
+          dragElement.classList.add("sparkle");
+          dragElement.style.transition = "all 0.4s ease";
+          dragElement.style.transform = "scale(0) rotate(180deg)";
+          dragElement.style.opacity = "0";
+          setTimeout(() => {
+            if (dragElement && dragElement.parentNode) dragElement.parentNode.removeChild(dragElement);
+            dragElement = null;
+            if (starCount >= 5) {
+              setTimeout(() => {
+                document.getElementById("winAudio").play();
+                document.getElementById("winPopup").style.display = "flex";
+              }, 400);
+            }
+          }, 420);
+      }else{
+          //送错，弹出错误提示
+          dragElement.classList.add("shake-anim");
+          document.getElementById("errorPopup").style.display="flex";
+      }
+    }else{
+      //没有放到房子上，退回
+      dragElement.classList.add("shake-anim");
+      setTimeout(() => {
+        if(dragElement) dragElement.classList.remove("shake-anim");
+        dragElement.style.position = "relative";
+        dragElement.style.left = "";
+        dragElement.style.top = "";
+        dragElement.style.zIndex = "";
+        dragElement.style.transition = "";
+        originalParent.appendChild(dragElement);
+        dragElement = null;
+      },420);
+    }
+  }
+
+  function updateStars() {
+    let stars = "";
+    for (let i = 0; i < 5; i++) {
+      if (i < starCount) {
+        stars += "<span style='color:#ffd447'>⭐</span>";
+      } else {
+        stars += "<span>☆</span>";
+      }
+    }
+    document.getElementById("starShow").innerHTML = stars;
+  }
+
+  function restartGame() {
+    starCount = 0;
+    updateStars();
+    document.getElementById("winPopup").style.display = "none";
+    renderBoxes();
+    renderHouses();
+  }
+
+  renderBoxes();
+  renderHouses();
+  updateStars();
+</script>
+</body>
+</html>
+<!-- （注：内容由AI生成） -->
